@@ -13,7 +13,6 @@ import (
 const (
 	defaultFacility    = 20
 	defaultHost        = "localhost"
-	defaultMessage     = "hello"
 	defaultPort        = 514
 	defaultProtocol    = "tcp"
 	defaultSeverity    = 5
@@ -66,6 +65,13 @@ func sendMessageViaSyslog(host string, port int, protocol, message, tag, hostnam
 	sendPayload(protocol, address, payload)
 }
 
+func ensureMessage(message string) {
+	if message == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+}
+
 func main() {
 	currentDate := time.Now()
 	currentDateAsString := currentDate.Format(expectedDateFormat)
@@ -77,13 +83,15 @@ func main() {
 	var facility = flag.Int("facility", defaultFacility, "facility for the log")
 	var hostname = flag.String("hostname", currentHostname, "hostname to associate with the log")
 	var host = flag.String("host", defaultHost, "syslog server host")
-	var message = flag.String("message", defaultMessage, "message to send")
+	var message = flag.String("message", "", "message to send")
 	var port = flag.Int("port", defaultPort, "syslog server port")
 	var protocol = flag.String("protocol", defaultProtocol, "protocol for connecting to the server")
 	var tag = flag.String("tag", defaultTag, "syslog tag for the log")
 	var severity = flag.Int("severity", defaultSeverity, "severity of the log")
 
 	flag.Parse()
+
+	ensureMessage(*message)
 
 	sendMessageViaSyslog(*host, *port, *protocol, *message, *tag, *hostname, *date, *facility, *severity)
 }
