@@ -35,6 +35,13 @@ func ensureCorrectProtocol(protocol string) {
 	}
 }
 
+func ensureMessage(message string) {
+	if message == "" {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+}
+
 func parseAndFormatDate(date string) string {
 	parsedDate, err := time.Parse(expectedDateFormat, date)
 	mare.PanicIfErr(err)
@@ -56,6 +63,7 @@ func sendPayload(protocol, address, payload string) {
 }
 
 func sendMessageViaSyslog(host string, port int, protocol, message, tag, hostname, date string, facility, severity int) {
+	ensureMessage(message)
 	ensureCorrectProtocol(protocol)
 
 	syslogFormattedDate := parseAndFormatDate(date)
@@ -63,13 +71,6 @@ func sendMessageViaSyslog(host string, port int, protocol, message, tag, hostnam
 	payload := getPayload(syslogFormattedDate, hostname, tag, message, facility, severity)
 
 	sendPayload(protocol, address, payload)
-}
-
-func ensureMessage(message string) {
-	if message == "" {
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
 }
 
 func main() {
@@ -90,8 +91,6 @@ func main() {
 	var severity = flag.Int("severity", defaultSeverity, "severity of the log")
 
 	flag.Parse()
-
-	ensureMessage(*message)
 
 	sendMessageViaSyslog(*host, *port, *protocol, *message, *tag, *hostname, *date, *facility, *severity)
 }

@@ -8,7 +8,7 @@ copy tcp-input.conf /etc/rsyslog.d/tcp-input.conf
 copy udp-input.conf /etc/rsyslog.d/udp-input.conf
 copy rsyslog.conf /etc/rsyslog.conf
 
-entrypoint rsyslogd -nd
+entrypoint ["rsyslogd", "-n"]
 
 expose 514/tcp
 expose 514/udp
